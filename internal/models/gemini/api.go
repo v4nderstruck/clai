@@ -16,7 +16,11 @@ func NewGeminiModel() *GeminiModel {
 }
 
 func (g *GeminiModel) ModelHelp() string {
-	return "Running Gemini Family. Make sure GEMINI_API_KEY is set."
+  if os.Getenv("GEMINI_API_KEY") != "" {
+    return "GEMINI_API_KEY set. Using Gemini Model Family."
+  }
+  return "GEMINI_API_KEY not set. Make sure to set this to use the gemini Model Family."
+
 }
 
 func (g *GeminiModel) OneShotPrompt(thinkLevel models.ThinkingLevel, systemPrompt string, prompt string) (string, error) {

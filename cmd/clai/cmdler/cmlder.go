@@ -25,18 +25,22 @@ var Cmdler = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		var err error
+
+		debugFlag, err := cmd.Flags().GetBool("debug")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to access debug flag: %v\n", err)
+			os.Exit(1)
+		}
 		getModel, err := cmd.Flags().GetString("model")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to access model flag: %v\n", err)
 			os.Exit(1)
 		}
-
 		claiTool, err := internal.NewClaiTool(getModel)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Wrong model flag: %v\n", err)
 			os.Exit(1)
 		}
-
 		systemPrompt, err := generateSystemPrompt()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Could not generate a system prompt : %v\n", err)
@@ -45,9 +49,11 @@ var Cmdler = &cobra.Command{
 
 		userPrompt := args[0]
 
-		fmt.Printf("systemPrompt: %s\n\n", systemPrompt)
-		fmt.Printf("userPrompt: %s\n\n", userPrompt)
-		fmt.Printf("ModelHelp: %s\n\n", claiTool.AiModel.ModelHelp())
+		if debugFlag {
+			fmt.Printf("systemPrompt: %s\n\n", systemPrompt)
+			fmt.Printf("userPrompt: %s\n\n", userPrompt)
+			fmt.Printf("ModelHelp: %s\n\n", claiTool.AiModel.ModelHelp())
+		}
 
 		cmdler, err := claiTool.AiModel.OneShotPrompt(0, systemPrompt, userPrompt)
 		if err != nil {
